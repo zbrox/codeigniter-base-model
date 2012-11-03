@@ -230,7 +230,7 @@ class MY_Model extends CI_Model
 
         if ($skip_validation === FALSE)
         {
-            $data = $this->_run_validation($data);
+            $data = $this->validate($data);
         }
 
         if ($data !== FALSE)
@@ -276,7 +276,7 @@ class MY_Model extends CI_Model
 
         if ($skip_validation === FALSE)
         {
-            $data = $this->_run_validation($data);
+            $data = $this->validate($data);
         }
 
         if ($data !== FALSE)
@@ -304,7 +304,7 @@ class MY_Model extends CI_Model
 
         if ($skip_validation === FALSE)
         {
-            $data = $this->_run_validation($data);
+            $data = $this->validate($data);
         }
 
         if ($data !== FALSE)
@@ -334,7 +334,7 @@ class MY_Model extends CI_Model
 
         $data = $this->trigger('before_update', $data);
 
-        if ($this->_run_validation($data) !== FALSE)
+        if ($this->validate($data) !== FALSE)
         {
             $result = $this->db->set($data)
                                ->update($this->_table);
@@ -814,13 +814,13 @@ class MY_Model extends CI_Model
     /**
      * Run validation on the passed data
      */
-    private function _run_validation($data)
+    public function validate($data)
     {
         if($this->skip_validation)
         {
             return $data;
         }
-
+        
         if(!empty($this->validate))
         {
             foreach($data as $key => $val)
@@ -836,7 +836,7 @@ class MY_Model extends CI_Model
 
                 if ($this->form_validation->run() === TRUE)
                 {
-                    return $_POST;
+                    return $data;
                 }
                 else
                 {
@@ -847,7 +847,7 @@ class MY_Model extends CI_Model
             {
                 if ($this->form_validation->run($this->validate) === TRUE)
                 {
-                    return $_POST;
+                    return $data;
                 }
                 else
                 {

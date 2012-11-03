@@ -475,8 +475,24 @@ class MY_Model extends CI_Model
 
             if (in_array($relationship, $this->_with))
             {
+                if ( ! isset($options['model']))
+                {
+                    $options['model'] = $relationship.'_model';
+                }
+                
                 $this->load->model($options['model']);
-                $row->{$relationship} = $this->{$options['model']}->get($row->{$options['primary_key']});
+                
+                if (isset($options['polymorphic']))
+                {
+                    $row->{$relationship} = $this->{$options['model']}->get_by(array(
+                        $options['polymorphic'].'_id'   => $row->{$this->primary_key},
+                        $options['polymorphic'].'_type' => singular($this->_table),
+                    ));
+                }
+                else
+                {
+                    $row->{$relationship} = $this->{$options['model']}->get($row->{$options['primary_key']});
+                }
             }
         }
 
@@ -495,8 +511,24 @@ class MY_Model extends CI_Model
 
             if (in_array($relationship, $this->_with))
             {
+                if ( ! isset($options['model']))
+                {
+                    $options['model'] = $relationship.'_model';
+                }
+                
                 $this->load->model($options['model']);
-                $row->{$relationship} = $this->{$options['model']}->get_many_by($options['primary_key'], $row->{$this->primary_key});
+
+                if (isset($options['polymorphic']))
+                {
+                    $row->{$relationship} = $this->{$options['model']}->get_many_by(array(
+                        $options['polymorphic'].'_id'   => $row->{$this->primary_key},
+                        $options['polymorphic'].'_type' => singular($this->_table),
+                    ));
+                }
+                else
+                {
+                    $row->{$relationship} = $this->{$options['model']}->get_many_by($options['primary_key'], $row->{$this->primary_key});
+                }
             }
         }
 

@@ -24,8 +24,9 @@ class Author_model extends MY_Model
 
 class Post_model extends MY_Model
 {
-    protected $_table = 'posts';
+    protected $_table  = 'posts';
     public $belongs_to = array( 'image' => array('polymorphic' => 'attached') );
+    public $has_many   = array( 'images' => array('polymorphic' => 'attached') );
 }
 
 class Image_model extends MY_Model

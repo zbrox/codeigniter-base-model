@@ -483,7 +483,7 @@ class MY_Model extends CI_Model
                 $this->load->model($options['model']);
                 
                 if (isset($options['polymorphic']))
-                {echo 'relate ';
+                {
                     $row->{$relationship} = $this->{$options['model']}->get_by(array(
                         $options['polymorphic'].'_id'   => $row->{$this->primary_key},
                         $options['polymorphic'].'_type' => singular($this->_table),
@@ -513,7 +513,7 @@ class MY_Model extends CI_Model
             {
                 if ( ! isset($options['model']))
                 {
-                    $options['model'] = $relationship.'_model';
+                    $options['model'] = singular($relationship).'_model';
                 }
                 
                 $this->load->model($options['model']);

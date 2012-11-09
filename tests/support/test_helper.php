@@ -51,11 +51,20 @@ class MY_Model_Mock_Loader
  */
 function singular($name)
 {
-    if ($name == 'posts')
+    switch($name)
     {
-        return 'post';
+        default:
+            return 'comment';
+        break;
+
+        case 'posts':
+            return 'post';
+        break;
+
+        case 'images':
+            return 'image';
+        break;
     }
-    return 'comment';
 }
 
 function plural($name)

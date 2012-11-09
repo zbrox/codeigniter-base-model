@@ -483,7 +483,7 @@ class MY_Model extends CI_Model
                 $this->load->model($options['model']);
                 
                 if (isset($options['polymorphic']))
-                {
+                {echo 'relate ';
                     $row->{$relationship} = $this->{$options['model']}->get_by(array(
                         $options['polymorphic'].'_id'   => $row->{$this->primary_key},
                         $options['polymorphic'].'_type' => singular($this->_table),
@@ -896,7 +896,31 @@ class MY_Model extends CI_Model
     {
         if (count($params) == 1)
         {
-            $this->db->where($params[0]);
+            if (is_array($params))
+            {
+                foreach ($params[0] as $field => $filter)
+                {
+                    if (is_array($filter))
+                    {
+                        $this->db->where_in($field, $filter);
+                    }
+                    else
+                    {
+                        if (is_int($field))
+                        {
+                            $this->db->where($filter);
+                        }
+                        else
+                        {
+                            $this->db->where($field, $filter);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                $this->db->where($params[0]);  
+            }
         }
         else
         {

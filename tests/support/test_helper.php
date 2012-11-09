@@ -51,6 +51,10 @@ class MY_Model_Mock_Loader
  */
 function singular($name)
 {
+    if ($name == 'posts')
+    {
+        return 'post';
+    }
     return 'comment';
 }
 

@@ -447,6 +447,40 @@ class MY_Model_tests extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected_object, $this->model->with('author')->get(1));
     }
 
+    public function test_belongs_to_polymorphic()
+    {
+        $post            = (object)array( 'id' => 1, 'title' => 'A Post', 'created_at' => time() );
+        $image_object    = (object)array( 'id' => 43, 'filename' => 'wow.jpg', 'attached_id' => 1, 'attached_type' => 'post' );
+        $expected_object = (object)array( 'id' => 1, 'title' => 'A Post', 'created_at' => time(), 'image' => $image_object );
+
+        $self =& $this;
+
+        $this->post_model = new Post_model();
+        $this->post_model->db = $this->getMock('MY_Model_Mock_DB');
+        $this->post_model->load = $this->getMock('MY_Model_Mock_Loader');
+
+        $image_model = new Image_model();
+        $image_model->db = $this->getMockBuilder('MY_Model_Mock_DB')->setMockClassName('Other_Mock_MY_Model_Mock_DB')->getMock();
+
+        $image_model->db->expects($this->at(1))->method('where')->with('attached_type', $image_object->attached_type)->will($this->returnValue($image_model->db));
+        $image_model->db->expects($this->at(0))->method('where')->with('attached_id', $image_object->attached_id)->will($this->returnValue($image_model->db));
+
+        $image_model->db->expects($this->once())->method('get')->will($this->returnValue($image_model->db));
+
+        $this->post_model->db->expects($this->once())->method('where')->will($this->returnValue($this->post_model->db));
+        $this->post_model->db->expects($this->once())->method('get')->will($this->returnValue($this->post_model->db));
+
+        $this->post_model->db->expects($this->once())->method('row')->will($this->returnValue($post));
+        $image_model->db->expects($this->once())->method('row')->will($this->returnValue($image_object));
+
+        $this->post_model->load->expects($this->once())->method('model')->with('image_model')
+                          ->will($this->returnCallback(function() use ($self, $image_model){
+                              $self->post_model->image_model = $image_model;
+                          }));
+
+        $this->assertEquals($expected_object, $this->post_model->with('image')->get(1));
+    }
+
     public function test_has_many()
     {
         $object = (object)array( 'id' => 1, 'title' => 'A Post', 'created_at' => time(), 'author_id' => 43 );
